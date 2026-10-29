@@ -1,0 +1,55 @@
+#
+ Ejecutables y compilaciones de DataFlex
+Programs/
+*.exe
+*.dll
+*.obj
+
+#
+ Archivos temporales
+*.log
+*.tmp
+*.bak
+*.cache
+*.swp
+Thumbs.db
+.DS_Store
+
+#
+ Configuración local y credenciales
+.env
+.env.*
+*.local
+
+# Configuración de conexión a MySQL
+Data/DFConnId.ini
+Data/*.int
+Data/*.log
+
+# Archivos locales y temporales de DataFlex
+Data/*.cch
+Data/*.k1
+Data/*.k2
+Data/*.k3
+IdeSrc/*.loc
+AppSrc/*.dep
+AppSrc/*.manifest
+
+# Claves y archivos generados
+AppSrc/LoginEncryptionKey.inc
+AppSrc/*.prn
+
+# Datos locales de DataFlex
+Data/*.dat
+Data/*.hdr
+Data/*.tag
+
+#
+ Configuración local adicional
+Data/Filelist.cfg
+AppHtml/web.config
+
+# Recursos estándar de DataFlex
+AppHtml/DfEngine/
+AppHtml/CssThemes/
+AppSrc/WebApp.cfg
