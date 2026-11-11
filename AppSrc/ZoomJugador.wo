@@ -1,12 +1,13 @@
-﻿// C:\DataFlex Projects\FutbolWebApp\AppSrc\ZoomJugador.wo
-// Ficha de jugador
-//
+﻿
+ // C:\DataFlex Projects\FutbolWebApp\AppSrc\ZoomJugador.wo
+ // Ficha de jugador - Sprint 2
 
 Use cWebView.pkg
 Use cWebPanel.pkg
 Use cWebMenuGroup.pkg
 Use cWebMenuItem.pkg
 Use cWebForm.pkg
+Use cWebButton.pkg
 
 Use cjugadorDataDictionary.dd
 
@@ -20,11 +21,10 @@ Object oZoomJugador is a cWebView
     Set piMaxWidth to 1024
 
     Object ojugador_DD is a cjugadorDataDictionary
-    End_Object 
+    End_Object
 
-    Set Main_DD To ojugador_DD
-    Set Server  To ojugador_DD
-
+    Set Main_DD to ojugador_DD
+    Set Server to ojugador_DD
 
     Object oWebMainPanel is a cWebPanel
         Set piColumnCount to 12
@@ -36,7 +36,7 @@ Object oZoomJugador is a cWebView
             Set piColumnIndex to 0
             Set peLabelPosition to lpTop
             Set psLabel to "ID"
-        End_Object 
+        End_Object
 
         Object ojugadorNombre is a cWebForm
             Entry_Item jugador.Nombre
@@ -44,7 +44,7 @@ Object oZoomJugador is a cWebView
             Set piColumnIndex to 0
             Set peLabelPosition to lpTop
             Set psLabel to "Nombre"
-        End_Object 
+        End_Object
 
         Object ojugadorApellido is a cWebForm
             Entry_Item jugador.Apellido
@@ -52,7 +52,7 @@ Object oZoomJugador is a cWebView
             Set piColumnIndex to 0
             Set peLabelPosition to lpTop
             Set psLabel to "Apellido"
-        End_Object 
+        End_Object
 
         Object ojugadorNacionalidad is a cWebForm
             Entry_Item jugador.Nacionalidad
@@ -60,7 +60,7 @@ Object oZoomJugador is a cWebView
             Set piColumnIndex to 0
             Set peLabelPosition to lpTop
             Set psLabel to "Nacionalidad"
-        End_Object 
+        End_Object
 
         Object ojugadorEquipoID is a cWebForm
             Entry_Item jugador.EquipoID
@@ -68,8 +68,21 @@ Object oZoomJugador is a cWebView
             Set piColumnIndex to 0
             Set peLabelPosition to lpTop
             Set psLabel to "Equipo"
-        End_Object 
-    End_Object 
+        End_Object
+
+        // Navegacion Undefined hacia las posiciones
+        Object oBtnVerPosiciones is a cWebButton
+            Set psCaption to "Ver posiciones"
+            Set piColumnSpan to 4
+
+            WebRegisterPath ntNavigateForwardCustom oSelectPosicion
+
+            Procedure OnClick
+                Send NavigatePath
+            End_Procedure
+        End_Object
+
+    End_Object
 
     Object oActionGroup is a cWebMenuGroup
 
@@ -80,18 +93,17 @@ Object oZoomJugador is a cWebView
             Procedure OnClick
                 Send Request_Save
             End_Procedure
-
-        End_Object 
+        End_Object
 
         Object oEditBtn is a cWebMenuItem
             Set psCSSClass to "WebEditMenuItem"
             Set psCaption to "Edit"
+
             Procedure OnClick
                 Send ChangeEditMode True
                 Send SetActionButtons
             End_Procedure
-
-        End_Object 
+        End_Object
 
         Object oDeleteBtn is a cWebMenuItem
             Set psCSSClass to "WebDeleteMenuItem"
@@ -101,20 +113,21 @@ Object oZoomJugador is a cWebView
             Procedure OnClick
                 Send Request_Delete
             End_Procedure
-
-        End_Object 
+        End_Object
 
         Object oCancelChangesBtn is a cWebMenuItem
             Set psCSSClass to "WebIcon_Refresh"
             Set psCaption to "Clear Changes"
             Set peActionDisplay to adMenu
+
             Procedure OnClick
                 Send RefreshRecord
             End_Procedure
+        End_Object
 
-        End_Object 
-    End_Object 
+    End_Object
 
+    // Control de botones segun el modo de la ficha
     Procedure SetActionButtons
         tWebNavigateData NavigateData
         Boolean bHasRecord
@@ -124,7 +137,6 @@ Object oZoomJugador is a cWebView
         Get GetNavigateData to NavigateData
         Get HasRecord of hoDD to bHasRecord
 
-        // let's hide all buttons and then Show the ones we want
         WebSet pbRender of oEditBtn to False
         WebSet pbRender of oSaveBtn to False
         WebSet pbRender of oCancelChangesBtn to False
@@ -140,36 +152,50 @@ Object oZoomJugador is a cWebView
         End
     End_Procedure
 
+    // Cerrar la ficha despues de guardar
     Procedure OnViewSaved Handle hoServer Boolean bChanged
-        // Close after save
         Send NavigateClose Self
     End_Procedure
 
-    // this will close the view after a delete
+    // Cerrar la ficha despues de borrar
     Procedure OnViewDeleted Handle hoDDO
         Send NavigateClose Self
     End_Procedure
 
+    // Personalizacion de titulos y migas de pan
     Procedure OnNavigateForward tWebNavigateData NavigateData Integer hoInvokingView Integer hoInvokingObject
+        Boolean bTieneRegistro
+        Handle hoDD
+        String sNombreCompleto
+
         Case Begin
             Case (NavigateData.eNavigateType = nfFromMain)
-                // If from main, this is a propbably a main file Select to Zoom.
                 Case Break
 
             Case (NavigateData.eNavigateType = nfFromParent)
-                // If from parent, this is a constrained drill down.
                 Case Break
 
             Case (NavigateData.eNavigateType = nfFromChild)
-                // If from child, this is a probably a parent Zoom from a Zoom.
                 Case Break
 
-            Case Else // must be nfUndefined
-
+            Case Else // nfUndefined
         Case End
 
-        Send SetActionButtons
+        Get Server to hoDD
+        Get HasRecord of hoDD to bTieneRegistro
 
+        If (bTieneRegistro) Begin
+            Move (Trim(jugador.Nombre) + " " + Trim(jugador.Apellido)) to sNombreCompleto
+
+            Send SetHeaderCaption ("Jugador: " + sNombreCompleto)
+            Send SetBreadcrumbCaption sNombreCompleto
+        End
+        Else Begin
+            Send SetHeaderCaption "Nuevo jugador"
+            Send SetBreadcrumbCaption "Nuevo jugador"
+        End
+
+        Send SetActionButtons
     End_Procedure
 
-End_Object 
+End_Object

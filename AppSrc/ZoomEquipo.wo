@@ -147,26 +147,41 @@ Object oZoomEquipo is a cWebView
         Send NavigateClose Self
     End_Procedure
 
+    
     Procedure OnNavigateForward tWebNavigateData NavigateData Integer hoInvokingView Integer hoInvokingObject
+        Boolean bTieneRegistro
+        Handle hoDD
+        String sNombreEquipo
+
         Case Begin
             Case (NavigateData.eNavigateType = nfFromMain)
-                // If from main, this is a propbably a main file Select to Zoom.
                 Case Break
 
             Case (NavigateData.eNavigateType = nfFromParent)
-                // If from parent, this is a constrained drill down.
                 Case Break
 
             Case (NavigateData.eNavigateType = nfFromChild)
-                // If from child, this is a probably a parent Zoom from a Zoom.
                 Case Break
 
-            Case Else // must be nfUndefined
-
+            Case Else // nfUndefined
         Case End
 
-        Send SetActionButtons
+        Get Server to hoDD
+        Get HasRecord of hoDD to bTieneRegistro
 
+        If (bTieneRegistro) Begin
+            Move (Trim(equipo.Nombre)) to sNombreEquipo
+
+            Send SetHeaderCaption ("Equipo: " + sNombreEquipo)
+            Send SetBreadcrumbCaption sNombreEquipo
+        End
+        Else Begin
+            Send SetHeaderCaption "Nuevo equipo"
+            Send SetBreadcrumbCaption "Nuevo equipo"
+        End
+
+        Send SetActionButtons
     End_Procedure
+
 
 End_Object 

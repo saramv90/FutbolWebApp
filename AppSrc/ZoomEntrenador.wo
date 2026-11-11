@@ -80,8 +80,7 @@ Object oZoomEntrenador is a cWebView
             Set psLabel to "Equipo"
             Set pbPromptButton to True
 
-// ToDo: Fill in the from-child parent Select view object name for navigate forward
-//            WebRegisterPath ntNavigateForward oSelectView
+WebRegisterPath ntNavigateForward oSelectEquipo
 
             Procedure OnPrompt
                 Send NavigatePath
@@ -168,26 +167,41 @@ Object oZoomEntrenador is a cWebView
         Send NavigateClose Self
     End_Procedure
 
+    
     Procedure OnNavigateForward tWebNavigateData NavigateData Integer hoInvokingView Integer hoInvokingObject
+        Boolean bTieneRegistro
+        Handle hoDD
+        String sNombreCompleto
+
         Case Begin
             Case (NavigateData.eNavigateType = nfFromMain)
-                // If from main, this is a propbably a main file Select to Zoom.
                 Case Break
 
             Case (NavigateData.eNavigateType = nfFromParent)
-                // If from parent, this is a constrained drill down.
                 Case Break
 
             Case (NavigateData.eNavigateType = nfFromChild)
-                // If from child, this is a probably a parent Zoom from a Zoom.
                 Case Break
 
-            Case Else // must be nfUndefined
-
+            Case Else // nfUndefined
         Case End
 
-        Send SetActionButtons
+        Get Server to hoDD
+        Get HasRecord of hoDD to bTieneRegistro
 
+        If (bTieneRegistro) Begin
+            Move (Trim(entrenador.Nombre) + " " + Trim(entrenador.Apellido)) to sNombreCompleto
+
+            Send SetHeaderCaption ("Entrenador: " + sNombreCompleto)
+            Send SetBreadcrumbCaption sNombreCompleto
+        End
+        Else Begin
+            Send SetHeaderCaption "Nuevo entrenador"
+            Send SetBreadcrumbCaption "Nuevo entrenador"
+        End
+
+        Send SetActionButtons
     End_Procedure
+
 
 End_Object 

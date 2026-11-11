@@ -7,8 +7,10 @@ Use cWebPanel.pkg
 Use cWebMenuGroup.pkg
 Use cWebMenuItem.pkg
 Use cWebForm.pkg
+Use cWebList.pkg
 
 Use cligaDataDictionary.dd
+Use cequipoDataDictionary.dd
 
 Object oZoomLiga is a cWebView
     Set piColumnCount to 12
@@ -21,6 +23,12 @@ Object oZoomLiga is a cWebView
 
     Object oliga_DD is a cligaDataDictionary
     End_Object 
+    
+    Object oequipo_DD is a cequipoDataDictionary
+    Set DDO_Server to oliga_DD
+    Set Constrain_File to liga.File_Number
+    End_Object
+    
 
     Set Main_DD To oliga_DD
     Set Server  To oliga_DD
@@ -69,6 +77,33 @@ Object oZoomLiga is a cWebView
             Set peLabelPosition to lpTop
             Set psLabel to "Máximo de equipos"
         End_Object 
+        
+        Object oListaEquiposLiga is a cWebList
+    Set Server to oequipo_DD
+    Set piColumnSpan to 12
+    Set piHeight to 200
+    Set pbShowHeader to True
+
+    Object oColNombreEquipo is a cWebColumn
+        Entry_Item equipo.Nombre
+        Set psCaption to "Equipos de esta liga"
+        Set piWidth to 200
+    End_Object
+    
+    End_Object  
+
+Object oBtnVerEquipos is a cWebButton
+    Set psCaption to "Ver equipos de esta liga"
+    Set piColumnSpan to 4
+
+    WebRegisterPath ntNavigateForward oSelectEquipo
+
+    Procedure OnClick
+        Send NavigatePath
+    End_Procedure
+End_Object
+        
+        
     End_Object 
 
     Object oActionGroup is a cWebMenuGroup
@@ -150,26 +185,41 @@ Object oZoomLiga is a cWebView
         Send NavigateClose Self
     End_Procedure
 
+    
     Procedure OnNavigateForward tWebNavigateData NavigateData Integer hoInvokingView Integer hoInvokingObject
+        Boolean bTieneRegistro
+        Handle hoDD
+        String sNombreLiga
+
         Case Begin
             Case (NavigateData.eNavigateType = nfFromMain)
-                // If from main, this is a propbably a main file Select to Zoom.
                 Case Break
 
             Case (NavigateData.eNavigateType = nfFromParent)
-                // If from parent, this is a constrained drill down.
                 Case Break
 
             Case (NavigateData.eNavigateType = nfFromChild)
-                // If from child, this is a probably a parent Zoom from a Zoom.
                 Case Break
 
-            Case Else // must be nfUndefined
-
+            Case Else // nfUndefined
         Case End
 
-        Send SetActionButtons
+        Get Server to hoDD
+        Get HasRecord of hoDD to bTieneRegistro
 
+        If (bTieneRegistro) Begin
+            Move (Trim(liga.Nombre)) to sNombreLiga
+
+            Send SetHeaderCaption ("Liga: " + sNombreLiga)
+            Send SetBreadcrumbCaption sNombreLiga
+        End
+        Else Begin
+            Send SetHeaderCaption "Nueva liga"
+            Send SetBreadcrumbCaption "Nueva liga"
+        End
+
+        Send SetActionButtons
     End_Procedure
+
 
 End_Object 
