@@ -245,3 +245,95 @@
         letter-spacing: .55px;
     }
 }
+/* ==========================================
+   SPRINT 3 - LISTADOS STREET
+   ========================================== */
+
+/* Marco del listado */
+#OWEBAPP .FutbolStreetList {
+    font-family: 'Trebuchet MS', Arial, sans-serif;
+    border-radius: 10px;
+    box-shadow: 0 5px 18px rgba(16, 39, 30, .14);
+}
+
+/* Cabecera verde */
+#OWEBAPP .FutbolStreetList .WebList_Head {
+    background: #195d3b;
+    border-bottom: 3px solid #ec3543;
+}
+
+#OWEBAPP .FutbolStreetList .WebList_Head .WebList_ColHead {
+    background: #195d3b;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+#OWEBAPP .FutbolStreetList .WebList_Head .WebList_ColHead a {
+    color: #ffffff;
+}
+
+/* Filas alternas */
+#OWEBAPP .FutbolStreetList .WebList_Row {
+    background: #ffffff;
+    color: #10271e;
+}
+
+#OWEBAPP .FutbolStreetList .WebList_Row.WebList_Alternating {
+    background: #edf7ee;
+}
+
+/* Texto de las celdas */
+#OWEBAPP .FutbolStreetList .WebList_Row .WebList_Cell {
+    font-family: 'Trebuchet MS', Arial, sans-serif;
+    font-size: 14px;
+    border-bottom: 1px solid #dce8df;
+}
+@media (hover: hover) {
+    #OWEBAPP .FutbolStreetList .WebList_Row:hover {
+        background: #d1e9d7;
+    }
+}
+
+#OWEBAPP .FutbolStreetList .WebList_Row.WebList_Selected {
+    background: #195d3b;
+    color: #ffffff;
+}
+
+#OWEBAPP .FutbolStreetList .WebList_Row.WebList_Selected .WebList_Cell {
+    color: #ffffff;
+    border-bottom-color: #195d3b;
+}
+
+#OWEBAPP .FutbolStreetList .WebList_Row.WebList_Selected .WebList_Cell:first-child {
+    box-shadow: inset 4px 0 0 #ec3543;
+}
+/* ==========================================
+   SPRINT 3 - FICHAS STREET
+   ========================================== */
+
+#OWEBAPP .FutbolStreetFicha {
+    background: #ffffff;
+    border-top: 4px solid #195d3b;
+    border-radius: 8px;
+    box-shadow: 0 5px 18px rgba(16, 39, 30, .12);
+}
+
+#OWEBAPP .FutbolStreetFicha .WebControl > div {
+    font-family: 'Trebuchet MS', Arial, sans-serif;
+}
+
+#OWEBAPP .FutbolStreetFicha .WebControl label {
+    color: #195d3b;
+    font-weight: 700;
+}
+
+#OWEBAPP .FutbolStreetFicha .WebButton button {
+    background: #195d3b;
+    color: #ffffff;
+    border-radius: 6px;
+    font-weight: 700;
+}
+
+#OWEBAPP .FutbolStreetFicha .WebButton button:hover {
+    background: #10271e;
+}

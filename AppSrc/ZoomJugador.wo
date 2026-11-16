@@ -26,7 +26,8 @@ Object oZoomJugador is a cWebView
     Set Main_DD to ojugador_DD
     Set Server to ojugador_DD
 
-    Object oWebMainPanel is a cWebPanel
+        Object oWebMainPanel is a cWebPanel
+        Set psCSSClass to "FutbolStreetFicha"
         Set piColumnCount to 12
         WebSetResponsive piColumnCount rmMobile to 4
 
@@ -40,40 +41,52 @@ Object oZoomJugador is a cWebView
 
         Object ojugadorNombre is a cWebForm
             Entry_Item jugador.Nombre
-            Set piColumnSpan to 10
+            Set piColumnSpan to 6
             Set piColumnIndex to 0
             Set peLabelPosition to lpTop
             Set psLabel to "Nombre"
+
+            WebSetResponsive piColumnSpan rmMobile to 4
         End_Object
 
         Object ojugadorApellido is a cWebForm
             Entry_Item jugador.Apellido
-            Set piColumnSpan to 10
-            Set piColumnIndex to 0
+            Set piColumnSpan to 6
+            Set piColumnIndex to 6
             Set peLabelPosition to lpTop
-            Set psLabel to "Apellido"
+            Set psLabel to "Apellidos"
+
+            WebSetResponsive piColumnSpan rmMobile to 4
+            WebSetResponsive piColumnIndex rmMobile to 0
         End_Object
 
         Object ojugadorNacionalidad is a cWebForm
             Entry_Item jugador.Nacionalidad
-            Set piColumnSpan to 8
+            Set piColumnSpan to 6
             Set piColumnIndex to 0
             Set peLabelPosition to lpTop
             Set psLabel to "Nacionalidad"
+
+            WebSetResponsive piColumnSpan rmMobile to 4
         End_Object
 
         Object ojugadorEquipoID is a cWebForm
             Entry_Item jugador.EquipoID
-            Set piColumnSpan to 2
-            Set piColumnIndex to 0
+            Set piColumnSpan to 6
+            Set piColumnIndex to 6
             Set peLabelPosition to lpTop
             Set psLabel to "Equipo"
+
+            WebSetResponsive piColumnSpan rmMobile to 4
+            WebSetResponsive piColumnIndex rmMobile to 0
         End_Object
 
-        // Navegacion Undefined hacia las posiciones
         Object oBtnVerPosiciones is a cWebButton
             Set psCaption to "Ver posiciones"
             Set piColumnSpan to 4
+            Set piColumnIndex to 0
+
+            WebSetResponsive piColumnSpan rmMobile to 4
 
             WebRegisterPath ntNavigateForwardCustom oSelectPosicion
 

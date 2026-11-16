@@ -26,7 +26,8 @@ Object oZoomPosicion is a cWebView
     Set Server  To oposicion_DD
 
 
-    Object oWebMainPanel is a cWebPanel
+        Object oWebMainPanel is a cWebPanel
+        Set psCSSClass to "FutbolStreetFicha"
         Set piColumnCount to 12
         WebSetResponsive piColumnCount rmMobile to 4
 
@@ -36,16 +37,19 @@ Object oZoomPosicion is a cWebView
             Set piColumnIndex to 0
             Set peLabelPosition to lpTop
             Set psLabel to "ID"
-        End_Object 
+        End_Object
 
         Object oposicionNombre is a cWebForm
             Entry_Item posicion.Nombre
-            Set piColumnSpan to 8
+            Set piColumnSpan to 12
             Set piColumnIndex to 0
             Set peLabelPosition to lpTop
-            Set psLabel to "Nombre"
-        End_Object 
-    End_Object 
+            Set psLabel to "Nombre de la posición"
+
+            WebSetResponsive piColumnSpan rmMobile to 4
+        End_Object
+
+    End_Object
 
     Object oActionGroup is a cWebMenuGroup
 
@@ -126,26 +130,27 @@ Object oZoomPosicion is a cWebView
         Send NavigateClose Self
     End_Procedure
 
-    Procedure OnNavigateForward tWebNavigateData NavigateData Integer hoInvokingView Integer hoInvokingObject
-        Case Begin
-            Case (NavigateData.eNavigateType = nfFromMain)
-                // If from main, this is a propbably a main file Select to Zoom.
-                Case Break
+        Procedure OnNavigateForward tWebNavigateData NavigateData Integer hoInvokingView Integer hoInvokingObject
+        Boolean bTieneRegistro
+        Handle hoDD
+        String sNombrePosicion
 
-            Case (NavigateData.eNavigateType = nfFromParent)
-                // If from parent, this is a constrained drill down.
-                Case Break
+        Get Server to hoDD
+        Get HasRecord of hoDD to bTieneRegistro
 
-            Case (NavigateData.eNavigateType = nfFromChild)
-                // If from child, this is a probably a parent Zoom from a Zoom.
-                Case Break
+        If (bTieneRegistro) Begin
+            Get Field_Current_Value of hoDD Field posicion.Nombre to sNombrePosicion
+            Move (Trim(sNombrePosicion)) to sNombrePosicion
 
-            Case Else // must be nfUndefined
-
-        Case End
+            Send SetHeaderCaption ("Posición: " + sNombrePosicion)
+            Send SetBreadcrumbCaption sNombrePosicion
+        End
+        Else Begin
+            Send SetHeaderCaption "Nueva posición"
+            Send SetBreadcrumbCaption "Nueva posición"
+        End
 
         Send SetActionButtons
-
     End_Procedure
 
 End_Object 

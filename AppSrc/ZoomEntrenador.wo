@@ -36,7 +36,8 @@ Object oZoomEntrenador is a cWebView
     Set Server  To oentrenador_DD
 
 
-    Object oWebMainPanel is a cWebPanel
+        Object oWebMainPanel is a cWebPanel
+        Set psCSSClass to "FutbolStreetFicha"
         Set piColumnCount to 12
         WebSetResponsive piColumnCount rmMobile to 4
 
@@ -46,47 +47,58 @@ Object oZoomEntrenador is a cWebView
             Set piColumnIndex to 0
             Set peLabelPosition to lpTop
             Set psLabel to "ID"
-        End_Object 
+        End_Object
 
         Object oentrenadorNombre is a cWebForm
             Entry_Item entrenador.Nombre
-            Set piColumnSpan to 10
+            Set piColumnSpan to 6
             Set piColumnIndex to 0
             Set peLabelPosition to lpTop
             Set psLabel to "Nombre"
-        End_Object 
+
+            WebSetResponsive piColumnSpan rmMobile to 4
+        End_Object
 
         Object oentrenadorApellido is a cWebForm
             Entry_Item entrenador.Apellido
-            Set piColumnSpan to 10
-            Set piColumnIndex to 0
+            Set piColumnSpan to 6
+            Set piColumnIndex to 6
             Set peLabelPosition to lpTop
-            Set psLabel to "Apellido"
-        End_Object 
+            Set psLabel to "Apellidos"
+
+            WebSetResponsive piColumnSpan rmMobile to 4
+            WebSetResponsive piColumnIndex rmMobile to 0
+        End_Object
 
         Object oentrenadorNacionalidad is a cWebForm
             Entry_Item entrenador.Nacionalidad
-            Set piColumnSpan to 8
+            Set piColumnSpan to 6
             Set piColumnIndex to 0
             Set peLabelPosition to lpTop
             Set psLabel to "Nacionalidad"
-        End_Object 
+
+            WebSetResponsive piColumnSpan rmMobile to 4
+        End_Object
 
         Object oequipoID is a cWebForm
             Entry_Item equipo.ID
-            Set piColumnSpan to 2
-            Set piColumnIndex to 0
+            Set piColumnSpan to 6
+            Set piColumnIndex to 6
             Set peLabelPosition to lpTop
             Set psLabel to "Equipo"
             Set pbPromptButton to True
 
-WebRegisterPath ntNavigateForward oSelectEquipo
+            WebSetResponsive piColumnSpan rmMobile to 4
+            WebSetResponsive piColumnIndex rmMobile to 0
+
+            WebRegisterPath ntNavigateForward oSelectEquipo
 
             Procedure OnPrompt
                 Send NavigatePath
             End_Procedure
-        End_Object 
-    End_Object 
+        End_Object
+
+    End_Object
 
     Object oActionGroup is a cWebMenuGroup
 
