@@ -337,3 +337,190 @@
 #OWEBAPP .FutbolStreetFicha .WebButton button:hover {
     background: #10271e;
 }
+/* SPRINT 3 - TIPOGRAFÍA Y MOVIMIENTO */
+
+/* Letra clara en listados y fichas */
+#OWEBAPP .FutbolStreetList,
+#OWEBAPP .FutbolStreetList .WebList_Cell,
+#OWEBAPP .FutbolStreetList .WebList_ColHead,
+#OWEBAPP .FutbolStreetFicha .WebControl,
+#OWEBAPP .FutbolStreetFicha input,
+#OWEBAPP .FutbolStreetFicha label,
+#OWEBAPP .FutbolStreetFicha button {
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Encabezados con más presencia */
+#OWEBAPP .FutbolStreetList .WebList_ColHead {
+    font-weight: 700;
+    letter-spacing: .35px;
+}
+
+#OWEBAPP .FutbolStreetFicha .WebControl label {
+    font-weight: 600;
+    letter-spacing: .2px;
+}
+
+/* Transiciones suaves en las filas */
+#OWEBAPP .FutbolStreetList .WebList_Row {
+    transition: background-color .18s ease, color .18s ease;
+}
+
+/* Botones */
+#OWEBAPP .FutbolStreetFicha .WebButton button {
+    transition:
+        background-color .18s ease,
+        box-shadow .18s ease,
+        transform .18s ease;
+}
+
+/* Efectos para dispositivos con ratón */
+@media (hover: hover) {
+    #OWEBAPP .FutbolStreetList .WebList_Row:not(.WebList_Selected):hover {
+        background-color: #e0f0e5;
+    }
+
+    #OWEBAPP .FutbolStreetFicha .WebButton button:hover {
+        background-color: #10271e;
+        box-shadow: 0 4px 0 #ec3543;
+        transform: translateY(-2px);
+    }
+}
+
+/* Entrada breve de las fichas */
+#OWEBAPP .FutbolStreetFicha {
+    animation: futbolFichaEntrada .25s ease-out;
+}
+
+@keyframes futbolFichaEntrada {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Respeta la preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    #OWEBAPP .FutbolStreetFicha {
+        animation: none;
+    }
+
+    #OWEBAPP .FutbolStreetList .WebList_Row,
+    #OWEBAPP .FutbolStreetFicha .WebButton button {
+        transition: none;
+    }
+
+    #OWEBAPP .FutbolStreetFicha .WebButton button:hover {
+        transform: none;
+    }
+}
+/* ==========================================
+   FUTBOLWEBAPP - ESTILO ESTADIO
+   ========================================== */
+
+/* Fondo: césped con líneas de un campo de fútbol */
+#OWEBAPP .WebView,
+#OWEBAPP .FutbolStreetDashboard,
+#OWEBAPP [data-dfobj="oDashboard.oWebMainPanel"] > .WebCon_Sizer > .WebCon_Content {
+    background-color: #123d2c;
+
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 760'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.13' stroke-width='3'%3E%3Crect x='60' y='50' width='1080' height='660' rx='2'/%3E%3Cpath d='M600 50V710'/%3E%3Ccircle cx='600' cy='380' r='95'/%3E%3Ccircle cx='600' cy='380' r='4' fill='%23ffffff'/%3E%3Cpath d='M60 190H230V570H60M1140 190H970V570H1140M60 285H125V475H60M1140 285H1075V475H1140'/%3E%3C/g%3E%3C/svg%3E"),
+        repeating-linear-gradient(
+            90deg,
+            rgba(255,255,255,.025) 0 100px,
+            rgba(0,0,0,.035) 100px 200px
+        ),
+        linear-gradient(135deg, #163f30, #236444);
+
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+/* Tipografía moderna de Windows, con alternativas */
+#OWEBAPP .FutbolStreetList,
+#OWEBAPP .FutbolStreetList .WebList_Row .WebList_Cell,
+#OWEBAPP .FutbolStreetList .WebList_Head .WebList_ColHead,
+#OWEBAPP .FutbolStreetList .WebList_Head .WebList_ColHead a,
+#OWEBAPP .FutbolStreetFicha .WebControl,
+#OWEBAPP .FutbolStreetFicha .WebControl > div,
+#OWEBAPP .FutbolStreetFicha .WebControl label,
+#OWEBAPP .FutbolStreetFicha input,
+#OWEBAPP .FutbolStreetFicha button {
+    font-family: "Bahnschrift", "Segoe UI", Arial, sans-serif;
+}
+
+/* Datos de los listados */
+#OWEBAPP .FutbolStreetList .WebList_Row .WebList_Cell {
+    font-size: 15px;
+}
+
+/* Encabezados deportivos */
+#OWEBAPP .FutbolStreetList .WebList_Head .WebList_ColHead {
+    font-weight: 700;
+    letter-spacing: .6px;
+}
+
+/* Etiquetas más legibles */
+#OWEBAPP .FutbolStreetFicha .WebControl label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #195d3b;
+    letter-spacing: .3px;
+}
+
+/* Texto de los formularios */
+#OWEBAPP .FutbolStreetFicha input {
+    font-size: 16px;
+    font-weight: 400;
+}
+
+/* Tarjetas sobre el fondo de césped */
+#OWEBAPP .FutbolStreetFicha {
+    background: #ffffff;
+    border-top: 4px solid #ec3543;
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.25);
+}
+
+/* Botones con más personalidad */
+#OWEBAPP .FutbolStreetFicha .WebButton button {
+    font-family: "Bahnschrift", "Segoe UI", Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: .5px;
+}
+/* Dejar visible el campo detrás del Dashboard */
+#OWEBAPP .FutbolStreetDashboard .WebCon_Sizer,
+#OWEBAPP .FutbolStreetDashboard .WebCon_Inner,
+#OWEBAPP .FutbolStreetDashboard .WebCon_ContentWrp,
+#OWEBAPP .FutbolStreetDashboard .WebCon_Content,
+#OWEBAPP .FutbolStreetDashboard .FutbolStreetTiles {
+    background-color: transparent;
+}
+
+/* Títulos deportivos más limpios */
+#OWEBAPP .FutbolStreetDashboard .FutbolStreetBox .FS_Title {
+    font-family: "Bahnschrift", "Segoe UI", Arial, sans-serif;
+    font-size: 29px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 1px;
+}
+
+/* Etiquetas y subtítulos */
+#OWEBAPP .FutbolStreetDashboard .FutbolStreetBox .FS_Tag,
+#OWEBAPP .FutbolStreetDashboard .FutbolStreetBox .FS_Subtitle {
+    font-family: "Bahnschrift", "Segoe UI", Arial, sans-serif;
+}
+
+@media (max-width: 700px) {
+    #OWEBAPP .FutbolStreetDashboard .FutbolStreetBox .FS_Title {
+        font-size: 24px;
+    }
+}
