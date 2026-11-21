@@ -4,10 +4,35 @@ Aplicación web de gestión de fútbol desarrollada con **DataFlex 2025 (versió
 
 **Autora:** Sara Montesinos Villalba  
 **Proyecto:** FutbolWebApp  
-**Estado:** Sprint 2 completado  
-**Fecha:** 11 de noviembre de 2026
+**Estado:** Sprint 4 · Validaciones y control de equipos por liga  
+**Fecha:** 21 de noviembre de 2026
 
 ---
+
+## Entrega actual · Sprint 4
+
+Al cambiar un equipo de liga, la aplicación resta una plaza ocupada en la liga de origen y suma una en la de destino. Si la liga de destino ha alcanzado su máximo, rechaza el cambio y conserva tanto la asignación original como los dos contadores. Esta lógica está en el diccionario de equipos, en los métodos `Backout` y `Update`. [Ver implementación](DDSrc/cequipoDataDictionary.dd)
+
+La ficha de liga muestra la ocupación encima del listado de clubes. Con plazas disponibles, el indicador aparece en verde. Al alcanzar el máximo, pasa a rojo y añade el texto «Liga completa». [Ver ficha de liga](AppSrc/ZoomLiga.wo)
+
+### Validaciones y gestión de entrenadores
+
+- Los diccionarios de datos protegen las claves y definen los campos obligatorios. En las fichas de jugador y entrenador, el nombre y el apellido se introducen en el alta y quedan bloqueados tras guardar.
+- Las fichas de jugador y entrenador permiten elegir la nacionalidad en un desplegable. Ambas listas leen las descripciones del tipo `NACION` en `CodeMast`.
+- El botón **Despedir** conserva la ficha del entrenador y guarda `NULL` en `EquipoID`, de modo que el entrenador queda disponible. [Ver ficha de entrenador](AppSrc/ZoomEntrenador.wo)
+
+### Pruebas realizadas en local
+
+| Prueba | Resultado observado |
+|---|---|
+| Cambiar el Arsenal FC a una liga con plazas | Los contadores de ambas ligas coincidieron con el recuento de equipos en MySQL. |
+| Intentar el cambio con la liga de destino llena | La aplicación mostró el aviso y mantuvo el equipo en su liga con los contadores originales. |
+| Consultar la Premier League con máximos de 3 y 20 | Con tres clubes, la ficha mostró «3 de 3 equipos · Liga completa» en rojo y, tras restaurar el máximo, «3 de 20 equipos» en verde. |
+| Crear una liga dejando el país vacío | El formulario señaló el campo **País** como obligatorio al intentar guardar. |
+| Despedir a Arne Slot | Se comprobó en MySQL que su registro seguía existiendo con `EquipoID` a `NULL`. |
+| Guardar una nacionalidad y reabrir la ficha | La selección se conservó. En la ficha del jugador Dani Calatrava se verificó también el bloqueo de nombre y apellido. |
+
+[Consultar el commit de implementación del Sprint 4](https://github.com/saramv90/FutbolWebApp/commit/57a9370b4ede639f4d9c594c6363cb67a154d9d1)
 
 ## 1. Descripción del proyecto
 
@@ -124,7 +149,7 @@ Se ha verificado que las tarjetas se reorganizan en una sola columna y mantienen
 
 La comprobación corresponde a una simulación de navegador; el acceso desde un teléfono físico no forma parte de las pruebas completadas.
 
-## 4. Archivos principales modificados
+## 4. Archivos principales del Sprint 2
 
 | Archivo | Función |
 |---|---|
@@ -135,7 +160,7 @@ La comprobación corresponde a una simulación de navegador; el acceso desde un 
 | `AppSrc/ZoomLiga.wo` | Ficha de liga y equipos relacionados |
 | `AppHtml/CssStyle/application.css` | Diseño visual Street Football |
 
-## 5. Pruebas realizadas
+## 5. Pruebas del Sprint 2
 
 Durante el Sprint se han realizado comprobaciones de compilación, navegación y visualización.
 
@@ -180,7 +205,7 @@ Dirección utilizada durante las prácticas:
 
 **Nota:** El repositorio contiene el código fuente; GitHub no ejecuta directamente la aplicación DataFlex.
 
-## 8. Conclusiones
+## 8. Conclusiones del Sprint 2
 
 En este segundo Sprint se ha conseguido mejorar la estructura de navegación de FutbolWebApp y hacer más clara la consulta de los datos relacionados.
 
@@ -191,5 +216,5 @@ El proyecto permite seguir ampliando funcionalidades y continuar trabajando sobr
 ---
 
 **Sara Montesinos Villalba**  
-Prácticas DAW – Sprint 2  
-11 de noviembre de 2026
+Prácticas DAW – Sprint 4  
+21 de noviembre de 2026
