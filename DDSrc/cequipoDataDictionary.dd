@@ -6,9 +6,10 @@ Open jugador
 Open liga
 
 Class cequipoDataDictionary is a DataDictionary
-    
+
     Procedure Construct_Object
         Forward Send Construct_Object
+
         Set Main_File to equipo.File_Number
 
         Set Add_Server_File to liga.File_Number
@@ -16,11 +17,36 @@ Class cequipoDataDictionary is a DataDictionary
         Set Add_Client_File to entrenador.File_Number
         Set Add_Client_File to jugador.File_Number
 
+        // Identificar y proteger la clave primaria
+        Set Key_Field_State Field equipo.ID to True
+        Set Protect_Key_State to True
+
+        // Permitir el nombre en altas y bloquear cambios posteriores
+        Set Field_Option Field equipo.Nombre DD_COMMIT to True
+
+        // Opciones cuando los campos se usan desde otras tablas
+        Set Field_Option Field equipo.Nombre DD_REQUIRED to True
+        Set Field_Option Field equipo.LigaID DD_REQUIRED to True
         Set Foreign_Field_Option DD_KEYFIELD DD_NOPUT to True
         Set Foreign_Field_Option DD_KEYFIELD DD_FINDREQ to True
         Set Foreign_Field_Option DD_INDEXFIELD DD_NOPUT to True
         Set Foreign_Field_Option DD_DEFAULT DD_DISPLAYONLY to True
 
+    End_Procedure
+    
+        Procedure Backout
+        Forward Send Backout
+        Move (liga.Equipos - 1) to liga.Equipos
+    End_Procedure
+
+    Procedure Update
+        Forward Send Update
+
+        If (liga.Equipos >= liga.EquiposMax) Begin
+            Send UserError "La liga seleccionada ya tiene el máximo de equipos."
+        End
+
+        Move (liga.Equipos + 1) to liga.Equipos
     End_Procedure
 
 End_Class

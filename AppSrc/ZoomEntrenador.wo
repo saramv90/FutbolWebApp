@@ -2,11 +2,13 @@
 // Ficha de entrenador
 //
 
+Use cWebButton.pkg
 Use cWebView.pkg
 Use cWebPanel.pkg
 Use cWebMenuGroup.pkg
 Use cWebMenuItem.pkg
 Use cWebForm.pkg
+Use cWebCombo.pkg
 
 Use cligaDataDictionary.dd
 Use cequipoDataDictionary.dd
@@ -70,7 +72,7 @@ Object oZoomEntrenador is a cWebView
             WebSetResponsive piColumnIndex rmMobile to 0
         End_Object
 
-        Object oentrenadorNacionalidad is a cWebForm
+        Object oentrenadorNacionalidad is a cWebCombo
             Entry_Item entrenador.Nacionalidad
             Set piColumnSpan to 6
             Set piColumnIndex to 0
@@ -86,15 +88,39 @@ Object oZoomEntrenador is a cWebView
             Set piColumnIndex to 6
             Set peLabelPosition to lpTop
             Set psLabel to "Equipo"
+            Set peDataType to typeNumber
+            Set psMask to "Z*"
+            Set psPlaceHolder to "Sin equipo"
             Set pbPromptButton to True
 
             WebSetResponsive piColumnSpan rmMobile to 4
             WebSetResponsive piColumnIndex rmMobile to 0
-
             WebRegisterPath ntNavigateForward oSelectEquipo
 
             Procedure OnPrompt
                 Send NavigatePath
+            End_Procedure
+        End_Object
+        
+                Object oDespedirBtn is a cWebButton
+            Set psCaption to "Despedir"
+            Set piColumnSpan to 4
+            Set piColumnIndex to 0
+            Set pbRender to False
+
+            Procedure OnClick
+                tWebNavigateData NavigateData
+                Boolean bTieneRegistro
+                Integer iEquipo
+
+                Get GetNavigateData of oZoomEntrenador to NavigateData
+                Get HasRecord of oentrenador_DD to bTieneRegistro
+                Get Field_Current_Value of oentrenador_DD Field entrenador.EquipoID to iEquipo
+
+                If (bTieneRegistro and not(NavigateData.bReadOnly) and iEquipo <> 0) Begin
+                    Send Request_ClearBindingTable of oequipoID
+                    Send Request_Save of oZoomEntrenador
+                End
             End_Procedure
         End_Object
 
@@ -144,20 +170,22 @@ Object oZoomEntrenador is a cWebView
         End_Object 
     End_Object 
 
-    Procedure SetActionButtons
+        Procedure SetActionButtons
         tWebNavigateData NavigateData
         Boolean bHasRecord
         Handle hoDD
+        Integer iEquipo
 
         Get Server to hoDD
         Get GetNavigateData to NavigateData
         Get HasRecord of hoDD to bHasRecord
+        Get Field_Current_Value of hoDD Field entrenador.EquipoID to iEquipo
 
-        // let's hide all buttons and then Show the ones we want
         WebSet pbRender of oEditBtn to False
         WebSet pbRender of oSaveBtn to False
         WebSet pbRender of oCancelChangesBtn to False
         WebSet pbRender of oDeleteBtn to False
+        WebSet pbRender of oDespedirBtn to False
 
         If (NavigateData.bReadOnly) Begin
             WebSet pbRender of oEditBtn to True
@@ -166,6 +194,7 @@ Object oZoomEntrenador is a cWebView
             WebSet pbRender of oSaveBtn to True
             WebSet pbRender of oCancelChangesBtn to True
             WebSet pbRender of oDeleteBtn to bHasRecord
+            WebSet pbRender of oDespedirBtn to (bHasRecord and iEquipo <> 0)
         End
     End_Procedure
 

@@ -7,6 +7,7 @@ Use cWebPanel.pkg
 Use cWebMenuGroup.pkg
 Use cWebMenuItem.pkg
 Use cWebForm.pkg
+Use cWebHtmlBox.pkg
 Use cWebList.pkg
 Use cWebColumn.pkg
 Use cWebButton.pkg
@@ -91,6 +92,30 @@ Object oZoomLiga is a cWebView
             WebSetResponsive piColumnIndex rmMobile to 0
         End_Object
 
+        Object oOcupacionLiga is a cWebHtmlBox
+            Set piColumnSpan to 12
+            WebSetResponsive piColumnSpan rmMobile to 4
+
+            Procedure ActualizarOcupacion
+                Integer iEquipos iMaximo
+                String sTexto sFondo sHtml
+
+                Get Field_Current_Value of oliga_DD Field liga.Equipos to iEquipos
+                Get Field_Current_Value of oliga_DD Field liga.EquiposMax to iMaximo
+                Move (String(iEquipos) + " de " + String(iMaximo) + " equipos") to sTexto
+                Move "#195D3B" to sFondo
+                If (iEquipos >= iMaximo) Begin
+                    Move (sTexto + " · Liga completa") to sTexto
+                    Move "#A51D2D" to sFondo
+                End
+
+                Move ('<span style="display:inline-block;margin:4px 0 6px;padding:3px 10px;' + ;
+                      'border-radius:6px;font-weight:600;color:#fff;background-color:' + ;
+                      sFondo + '">' + sTexto + '</span>') to sHtml
+                Send UpdateHTML sHtml
+            End_Procedure
+        End_Object
+
         Object oListaEquiposLiga is a cWebList
             Set Server to oequipo_DD
             Set psCSSClass to "FutbolStreetList"
@@ -119,6 +144,11 @@ Object oZoomLiga is a cWebView
 
             Procedure OnClick
                 Send NavigatePath
+            End_Procedure
+
+            Procedure OnNavigateBack Handle hoCallback tWebNavigateData NavigateData
+                Forward Send OnNavigateBack hoCallback NavigateData
+                Send ActualizarOcupacion of oOcupacionLiga
             End_Procedure
         End_Object
 
@@ -176,6 +206,11 @@ Object oZoomLiga is a cWebView
         Get Server to hoDD
         Get GetNavigateData to NavigateData
         Get HasRecord of hoDD to bHasRecord
+
+        WebSet pbRender of oOcupacionLiga to (bHasRecord and NavigateData.bReadOnly)
+        If (bHasRecord and NavigateData.bReadOnly) Begin
+            Send ActualizarOcupacion of oOcupacionLiga
+        End
 
         // let's hide all buttons and then Show the ones we want
         WebSet pbRender of oEditBtn to False

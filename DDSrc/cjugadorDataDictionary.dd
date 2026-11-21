@@ -3,14 +3,47 @@
 Open jugador
 Open jugadorposicion
 
+Open CodeMast
+
+Object oJugadorNacionalidadVT is a DescriptionValidationTable
+    Set Allow_Blank_State to True
+
+    Procedure Fill_List
+        String sNacionalidad
+        Forward Send Fill_List
+
+        Clear CodeMast
+        Move "NACION" to CodeMast.Type
+        Find gt CodeMast by Index.1
+
+        While (Found and (Trim(CodeMast.Type) = "NACION"))
+            Move (Trim(CodeMast.Description)) to sNacionalidad
+            Send Add_Table_Value sNacionalidad sNacionalidad
+            Find gt CodeMast by Index.1
+        Loop
+    End_Procedure
+End_Object
+
 Class cjugadorDataDictionary is a DataDictionary
-    
+
     Procedure Construct_Object
         Forward Send Construct_Object
+
         Set Main_File to jugador.File_Number
-
         Set Add_Client_File to jugadorposicion.File_Number
+        Set Field_Value_Table Field jugador.Nacionalidad to oJugadorNacionalidadVT
 
+        // Identificar y proteger la clave primaria
+        Set Key_Field_State Field jugador.ID to True
+        Set Protect_Key_State to True
+
+        // Permitir nombres en altas y bloquear cambios posteriores
+        Set Field_Option Field jugador.Nombre DD_COMMIT to True
+        Set Field_Option Field jugador.Apellido DD_COMMIT to True
+
+        // Opciones cuando los campos se usan desde otras tablas
+        Set Field_Option Field jugador.Nombre DD_REQUIRED to True
+        Set Field_Option Field jugador.Apellido DD_REQUIRED to True
         Set Foreign_Field_Option DD_KEYFIELD DD_NOPUT to True
         Set Foreign_Field_Option DD_KEYFIELD DD_FINDREQ to True
         Set Foreign_Field_Option DD_INDEXFIELD DD_NOPUT to True
