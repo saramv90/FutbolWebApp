@@ -4,6 +4,8 @@
 
 Use cWebView.pkg
 Use cWebList.pkg
+Use cWebGroup.pkg
+Use cWebButton.pkg
 Use cWebMenuGroup.pkg
 Use cWebMenuItem.pkg
 Use cWebColumnButton.pkg
@@ -22,6 +24,10 @@ Object oSelectJugadorPosicion is a cWebView
     Set pbShowCaption to False
     Set piMaxWidth to 1024
 
+    // Jugador de la ficha que abrió el editor, también cuando aún no hay asignaciones.
+    { WebProperty=Server }
+    Property String psFilaJugadorEditor ""
+
     Object ojugador_DD is a cjugadorDataDictionary
     End_Object 
 
@@ -33,8 +39,26 @@ Object oSelectJugadorPosicion is a cWebView
         Set DDO_Server To oposicion_DD
     End_Object 
 
+    // El catálogo conserva su selección al cambiar de fila en las asignadas.
+    Object oCatalogoPosicion_DD is a cposicionDataDictionary
+    End_Object
+
+    // Diccionarios de trabajo del botón Añadir. Ninguna lista usa estos servidores.
+    // Se inicializan en cada operación y no conservan estado entre peticiones.
+    Object oAltaJugador_DD is a cjugadorDataDictionary
+    End_Object
+
+    Object oAltaPosicion_DD is a cposicionDataDictionary
+    End_Object
+
+    Object oAltaAsignacion_DD is a cjugadorposicionDataDictionary
+        Set DDO_Server to oAltaJugador_DD
+        Set DDO_Server to oAltaPosicion_DD
+    End_Object
+
     Set Main_DD To ojugadorposicion_DD
     Set Server  To ojugadorposicion_DD
+    Send AddDDOStructure oCatalogoPosicion_DD
 
 
     Object oList is a cWebList
@@ -115,6 +139,70 @@ Object oSelectJugadorPosicion is a cWebView
 
     End_Object 
 
+    Register_Procedure AnadirPosicion
+    Register_Procedure QuitarPosicion
+
+    Object oGrupoCatalogo is a cWebGroup
+        Set psCaption to "Todas las posiciones"
+        Set piColumnSpan to 6
+        Set piColumnIndex to 0
+        Set pbRender to False
+        WebSetResponsive piColumnSpan rmMobile to 12
+
+        Object oListaCatalogo is a cWebList
+            Set Server to oCatalogoPosicion_DD
+            Set piColumnSpan to 0
+            Set piHeight to 220
+            Set pbShowHeader to False
+
+            Object oNombreCatalogo is a cWebColumn
+                Entry_Item posicion.Nombre
+                Set psCaption to "Posición"
+                Set piWidth to 200
+            End_Object
+        End_Object
+
+        Object oAnadir is a cWebButton
+            Set psCaption to "Añadir"
+            Set piColumnSpan to 0
+
+            Procedure OnClick
+                Send AnadirPosicion of oSelectJugadorPosicion
+            End_Procedure
+        End_Object
+    End_Object
+
+    Object oGrupoAsignadas is a cWebGroup
+        Set psCaption to "Posiciones del jugador"
+        Set piColumnSpan to 6
+        Set piColumnIndex to 6
+        Set pbRender to False
+        WebSetResponsive piColumnSpan rmMobile to 12
+        WebSetResponsive piColumnIndex rmMobile to 0
+
+        Object oListaAsignadas is a cWebList
+            Set Server to ojugadorposicion_DD
+            Set piColumnSpan to 0
+            Set piHeight to 220
+            Set pbShowHeader to False
+
+            Object oNombreAsignado is a cWebColumn
+                Entry_Item posicion.Nombre
+                Set psCaption to "Posición asignada"
+                Set piWidth to 200
+            End_Object
+        End_Object
+
+        Object oQuitar is a cWebButton
+            Set psCaption to "Quitar"
+            Set piColumnSpan to 0
+
+            Procedure OnClick
+                Send QuitarPosicion of oSelectJugadorPosicion
+            End_Procedure
+        End_Object
+    End_Object
+
     Object oActionGroup is a cWebMenuGroup
 
         Object oSearch is a cWebMenuItem
@@ -144,7 +232,148 @@ Object oSelectJugadorPosicion is a cWebView
         End_Object 
     End_Object 
 
+    Function EsEditorDeJugador tWebNavigateData Datos Returns Boolean
+        Function_Return ((Datos.eNavigateType = nfFromParent) and (Datos.iTable = jugador.File_Number) and (Datos.sRowID <> "") and (not(Datos.bReadOnly)))
+    End_Function
+
+    Function IndiceJugadorPosicion Returns Integer
+        Handle hTabla
+        Integer iUltimo iIndice iSegmentos iPrimero iSegundo
+        Move jugadorposicion.File_Number to hTabla
+        Get_Attribute DF_FILE_LAST_INDEX_NUMBER of hTabla to iUltimo
+        For iIndice from 1 to iUltimo
+            Get_Attribute DF_INDEX_NUMBER_SEGMENTS of hTabla iIndice to iSegmentos
+            If (iSegmentos = 2) Begin
+                Get_Attribute DF_INDEX_SEGMENT_FIELD of hTabla iIndice 1 to iPrimero
+                Get_Attribute DF_INDEX_SEGMENT_FIELD of hTabla iIndice 2 to iSegundo
+                If ((iPrimero = RefTable(jugadorposicion.JugadorID)) and (iSegundo = RefTable(jugadorposicion.PosicionID))) Function_Return iIndice
+            End
+        Loop
+        Function_Return 0
+    End_Function
+
+    Function CargarPadresParaAlta RowID riJugador RowID riPosicion Returns String
+        Send Clear_All of oAltaAsignacion_DD
+        Send FindByRowId of oAltaJugador_DD jugador.File_Number riJugador
+        If (not(IsSameRowID(CurrentRowId(oAltaJugador_DD), riJugador))) Begin
+            Function_Return "El jugador ya no está disponible. Vuelve a su ficha."
+        End
+        Send FindByRowId of oAltaPosicion_DD posicion.File_Number riPosicion
+        If (not(IsSameRowID(CurrentRowId(oAltaPosicion_DD), riPosicion))) Begin
+            Function_Return "La posición seleccionada ya no está en el catálogo."
+        End
+        Function_Return ""
+    End_Function
+
+    Procedure AnadirPosicion
+        tWebNavigateData Datos
+        String sFilaJugador sFila sError
+        RowID riJugador riPosicion
+        Integer iJugador iPosicion iIndice
+        Boolean bExiste bError
+
+        Get GetNavigateData to Datos
+        If (not(EsEditorDeJugador(Self, Datos))) Procedure_Return
+        WebGet psFilaJugadorEditor to sFilaJugador
+        If (sFilaJugador = "") Begin
+            Send ShowInfoBox "Abre de nuevo el editor desde la ficha del jugador."
+            Procedure_Return
+        End
+        WebGet psCurrentRowID of oListaCatalogo to sFila
+        If (sFila = "") Begin
+            Send ShowInfoBox "Selecciona una posición del catálogo."
+            Procedure_Return
+        End
+        Move (DeserializeRowID(sFilaJugador)) to riJugador
+        Move (DeserializeRowID(sFila)) to riPosicion
+        If (IsNullRowID(riJugador) or IsNullRowID(riPosicion)) Begin
+            Send ShowInfoBox "No se pudo identificar la fila seleccionada."
+            Procedure_Return
+        End
+        Get IndiceJugadorPosicion to iIndice
+        If (iIndice < 1) Begin
+            Send ShowInfoBox "Revisa el índice de JugadorID y PosicionID en jugadorposicion."
+            Procedure_Return
+        End
+
+        Get CargarPadresParaAlta riJugador riPosicion to sError
+        If (sError <> "") Begin
+            Send ShowInfoBox sError
+            Procedure_Return
+        End
+        Get Field_Current_Value of oAltaJugador_DD Field jugador.ID to iJugador
+        Get Field_Current_Value of oAltaPosicion_DD Field posicion.ID to iPosicion
+        Move iJugador to jugadorposicion.JugadorID
+        Move iPosicion to jugadorposicion.PosicionID
+        Send Request_Find of oAltaAsignacion_DD EQ jugadorposicion.File_Number iIndice
+        Move (Found) to bExiste
+        If (bExiste) Begin
+            Send ShowInfoBox "Esta posición ya está asignada al jugador."
+            Procedure_Return
+        End
+
+        Get CargarPadresParaAlta riJugador riPosicion to sError
+        If (sError <> "") Begin
+            Send ShowInfoBox sError
+            Procedure_Return
+        End
+        Set Field_Changed_Value of oAltaAsignacion_DD Field jugadorposicion.JugadorID to iJugador
+        Set Field_Changed_Value of oAltaAsignacion_DD Field jugadorposicion.PosicionID to iPosicion
+        Get Request_Validate of oAltaAsignacion_DD to bError
+        If (bError) Procedure_Return
+        Send Request_Save of oAltaAsignacion_DD
+        Send FindFromTop of oListaAsignadas
+    End_Procedure
+
+    Procedure QuitarPosicion
+        tWebNavigateData Datos
+        String sAsignacion sFilaJugador
+        RowID riAsignacion riJugador
+
+        Get GetNavigateData to Datos
+        If (not(EsEditorDeJugador(Self, Datos))) Procedure_Return
+        WebGet psFilaJugadorEditor to sFilaJugador
+        If (sFilaJugador = "") Procedure_Return
+        WebGet psCurrentRowID of oListaAsignadas to sAsignacion
+        If (sAsignacion = "") Begin
+            Send ShowInfoBox "Selecciona una posición asignada."
+            Procedure_Return
+        End
+        Move (DeserializeRowID(sAsignacion)) to riAsignacion
+        Send FindByRowId of ojugadorposicion_DD jugadorposicion.File_Number riAsignacion
+        If (Found) Begin
+            Get CurrentRowId of ojugador_DD to riJugador
+            If (IsSameRowID(riJugador, DeserializeRowID(sFilaJugador))) Begin
+                Send Request_Delete of ojugadorposicion_DD
+            End
+        End
+        Send FindFromTop of oListaAsignadas
+    End_Procedure
+
     Procedure OnNavigateForward tWebNavigateData NavigateData Integer hoInvokingView Integer hoInvokingObject
+        Boolean bEditor
+        String sNombre sApellido
+        RowID riJugador
+        WebSet psFilaJugadorEditor to ""
+        Get EsEditorDeJugador NavigateData to bEditor
+        WebSet pbRender of oGrupoCatalogo to bEditor
+        WebSet pbRender of oGrupoAsignadas to bEditor
+        WebSet pbRender of oList to (not(bEditor))
+        WebSet pbRender of oSearch to (not(bEditor))
+        If (bEditor) Begin
+            WebSet pbRender of oNewButton to False
+            Get CurrentRowId of ojugador_DD to riJugador
+            If (not(IsNullRowID(riJugador))) WebSet psFilaJugadorEditor to (SerializeRowID(riJugador))
+            Get Field_Current_Value of ojugador_DD Field jugador.Nombre to sNombre
+            Get Field_Current_Value of ojugador_DD Field jugador.Apellido to sApellido
+            Send SetHeaderCaption ("Posiciones de " + Trim(sNombre) + " " + Trim(sApellido))
+            Send SetBreadcrumbCaption "Editar posiciones"
+            Send FindFromTop of oListaCatalogo
+            Send FindFromTop of oListaAsignadas
+            Procedure_Return
+        End
+        Send SetHeaderCaption "Posiciones de jugadores"
+        Send SetBreadcrumbCaption "Posiciones de jugadores"
         WebSet pbRender of oNewButton to True
         WebSet pbRender of oDetailButton to True
 

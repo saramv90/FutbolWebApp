@@ -9,8 +9,12 @@ Use cWebMenuItem.pkg
 Use cWebForm.pkg
 Use cWebButton.pkg
 Use cWebCombo.pkg
+Use cWebList.pkg
+Use cWebColumn.pkg
 
 Use cjugadorDataDictionary.dd
+Use cposicionDataDictionary.dd
+Use cjugadorposicionDataDictionary.dd
 
 Object oZoomJugador is a cWebView
     Set piColumnCount to 12
@@ -18,10 +22,20 @@ Object oZoomJugador is a cWebView
     Set peWebViewStyle to wvsDrilldown
     Set peViewType to vtZoom
     Set pbShowCaption to False
+    Set pbServerOnShow to True
     Set Verify_Save_Msg to 0
     Set piMaxWidth to 1024
 
     Object ojugador_DD is a cjugadorDataDictionary
+    End_Object
+
+    Object oposicion_DD is a cposicionDataDictionary
+    End_Object
+
+    Object ojugadorposicion_DD is a cjugadorposicionDataDictionary
+        Set DDO_Server to ojugador_DD
+        Set DDO_Server to oposicion_DD
+        Set Constrain_File to jugador.File_Number
     End_Object
 
     Set Main_DD to ojugador_DD
@@ -82,18 +96,34 @@ Object oZoomJugador is a cWebView
             WebSetResponsive piColumnIndex rmMobile to 0
         End_Object
 
-        Object oBtnVerPosiciones is a cWebButton
-            Set psCaption to "Ver posiciones"
+        Object oBtnEditarPosiciones is a cWebButton
+            Set psCaption to "Editar Posiciones"
             Set piColumnSpan to 4
             Set piColumnIndex to 0
 
             WebSetResponsive piColumnSpan rmMobile to 4
 
-            WebRegisterPath ntNavigateForwardCustom oSelectPosicion
+            WebRegisterPath ntNavigateForward oSelectJugadorPosicion
 
             Procedure OnClick
                 Send NavigatePath
             End_Procedure
+        End_Object
+
+        Object oPosicionesJugador is a cWebList
+            Set Server to ojugadorposicion_DD
+            Set piColumnSpan to 12
+            Set piColumnIndex to 0
+            Set piHeight to 150
+            Set psCSSClass to "FutbolStreetList"
+            Set pbShowHeader to True
+            WebSetResponsive piColumnSpan rmMobile to 4
+
+            Object oNombrePosicion is a cWebColumn
+                Entry_Item posicion.Nombre
+                Set psCaption to "Posiciones del jugador"
+                Set piWidth to 250
+            End_Object
         End_Object
 
     End_Object
@@ -141,6 +171,12 @@ Object oZoomJugador is a cWebView
 
     End_Object
 
+    // También actualiza la ficha si se vuelve mediante las migas de pan.
+    Procedure OnShow
+        Forward Send OnShow
+        If (HasRecord(ojugador_DD)) Send RefreshListFromDD of oPosicionesJugador
+    End_Procedure
+
     // Control de botones segun el modo de la ficha
     Procedure SetActionButtons
         tWebNavigateData NavigateData
@@ -151,6 +187,8 @@ Object oZoomJugador is a cWebView
         Get GetNavigateData to NavigateData
         Get HasRecord of hoDD to bHasRecord
 
+        WebSet pbRender of oPosicionesJugador to bHasRecord
+        WebSet pbRender of oBtnEditarPosiciones to False
         WebSet pbRender of oEditBtn to False
         WebSet pbRender of oSaveBtn to False
         WebSet pbRender of oCancelChangesBtn to False
@@ -160,6 +198,7 @@ Object oZoomJugador is a cWebView
             WebSet pbRender of oEditBtn to True
         End
         Else Begin
+            WebSet pbRender of oBtnEditarPosiciones to bHasRecord
             WebSet pbRender of oSaveBtn to True
             WebSet pbRender of oCancelChangesBtn to True
             WebSet pbRender of oDeleteBtn to bHasRecord
