@@ -22,6 +22,7 @@ Object oZoomJugador is a cWebView
     Set peWebViewStyle to wvsDrilldown
     Set peViewType to vtZoom
     Set pbShowCaption to False
+    Set pbServerOnShow to True
     Set Verify_Save_Msg to 0
     Set piMaxWidth to 1024
 
@@ -95,6 +96,20 @@ Object oZoomJugador is a cWebView
             WebSetResponsive piColumnIndex rmMobile to 0
         End_Object
 
+        Object oBtnEditarPosiciones is a cWebButton
+            Set psCaption to "Editar Posiciones"
+            Set piColumnSpan to 4
+            Set piColumnIndex to 0
+
+            WebSetResponsive piColumnSpan rmMobile to 4
+
+            WebRegisterPath ntNavigateForward oSelectJugadorPosicion
+
+            Procedure OnClick
+                Send NavigatePath
+            End_Procedure
+        End_Object
+
         Object oPosicionesJugador is a cWebList
             Set Server to ojugadorposicion_DD
             Set piColumnSpan to 12
@@ -109,20 +124,6 @@ Object oZoomJugador is a cWebView
                 Set psCaption to "Posiciones del jugador"
                 Set piWidth to 250
             End_Object
-        End_Object
-
-        Object oBtnVerPosiciones is a cWebButton
-            Set psCaption to "Ver posiciones"
-            Set piColumnSpan to 4
-            Set piColumnIndex to 0
-
-            WebSetResponsive piColumnSpan rmMobile to 4
-
-            WebRegisterPath ntNavigateForwardCustom oSelectPosicion
-
-            Procedure OnClick
-                Send NavigatePath
-            End_Procedure
         End_Object
 
     End_Object
@@ -170,6 +171,12 @@ Object oZoomJugador is a cWebView
 
     End_Object
 
+    // También actualiza la ficha si se vuelve mediante las migas de pan.
+    Procedure OnShow
+        Forward Send OnShow
+        If (HasRecord(ojugador_DD)) Send RefreshListFromDD of oPosicionesJugador
+    End_Procedure
+
     // Control de botones segun el modo de la ficha
     Procedure SetActionButtons
         tWebNavigateData NavigateData
@@ -181,6 +188,7 @@ Object oZoomJugador is a cWebView
         Get HasRecord of hoDD to bHasRecord
 
         WebSet pbRender of oPosicionesJugador to bHasRecord
+        WebSet pbRender of oBtnEditarPosiciones to False
         WebSet pbRender of oEditBtn to False
         WebSet pbRender of oSaveBtn to False
         WebSet pbRender of oCancelChangesBtn to False
@@ -190,6 +198,7 @@ Object oZoomJugador is a cWebView
             WebSet pbRender of oEditBtn to True
         End
         Else Begin
+            WebSet pbRender of oBtnEditarPosiciones to bHasRecord
             WebSet pbRender of oSaveBtn to True
             WebSet pbRender of oCancelChangesBtn to True
             WebSet pbRender of oDeleteBtn to bHasRecord

@@ -4,12 +4,27 @@ Aplicación web de gestión de fútbol desarrollada con **DataFlex 2025 (versió
 
 **Autora:** Sara Montesinos Villalba  
 **Proyecto:** FutbolWebApp  
-**Estado:** Sprint 4 · Validaciones y control de equipos por liga  
-**Fecha:** 21 de noviembre de 2026
+**Estado:** Sprint 5 · Posiciones de cada jugador
+
+**Fecha:** 25 de noviembre de 2026
 
 ---
 
-## Entrega actual · Sprint 4
+## Sprint 5 · Posiciones de cada jugador
+
+La ficha muestra las posiciones asignadas al jugador. Para modificarlas, abre **Jugadores**, elige un jugador guardado, pulsa el lápiz y selecciona **Editar Posiciones**. La lista izquierda contiene el catálogo completo. La derecha muestra las posiciones del jugador elegido. [Ficha de jugador](AppSrc/ZoomJugador.wo)
+
+**Añadir** comprueba si la pareja `JugadorID` y `PosicionID` ya existe en `jugadorposicion`. Si existe, muestra un aviso. Si es nueva, guarda la asignación. **Quitar** elimina la asignación seleccionada en la lista derecha. La posición sigue disponible en el catálogo para otros jugadores. Ambos botones guardan el cambio en el momento. [Editor de posiciones](AppSrc/SelectJugadorPosicion.wo)
+
+### Pruebas en local con Thibaut Courtois
+
+| Acción | Resultado observado |
+|---|---|
+| Intentar añadir Portero cuando ya estaba asignado | Apareció el aviso «Esta posición ya está asignada al jugador» y Portero siguió apareciendo una sola vez. |
+| Añadir Defensa y Centrocampista y volver a la ficha | La ficha mostró Portero, Defensa y Centrocampista. |
+| Quitar las dos posiciones de prueba y volver a la ficha | Courtois volvió a figurar solo como Portero. |
+
+## Sprint 4 · Validaciones y control de equipos por liga
 
 Al cambiar un equipo de liga, la aplicación resta una plaza ocupada en la liga de origen y suma una en la de destino. Si la liga de destino ha alcanzado su máximo, rechaza el cambio y conserva tanto la asignación original como los dos contadores. Esta lógica está en el diccionario de equipos, en los métodos `Backout` y `Update`. [Ver implementación](DDSrc/cequipoDataDictionary.dd)
 
@@ -216,5 +231,6 @@ El proyecto permite seguir ampliando funcionalidades y continuar trabajando sobr
 ---
 
 **Sara Montesinos Villalba**  
-Prácticas DAW – Sprint 4  
-21 de noviembre de 2026
+Prácticas DAW – Sprint 5
+
+25 de noviembre de 2026
